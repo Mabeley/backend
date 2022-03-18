@@ -1,1 +1,3 @@
 entorno_flask/
+#excluimos los archivos cache de python
+*pyc
