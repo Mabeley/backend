@@ -1,6 +1,8 @@
 from flask_restful import Resource, request
 from config import conexion
 from models.ingredientes import Ingrediente
+from dtos.dto_prueba import ValidadorPrueba, ValidarUsuarioPrueba
+from dtos.ingrediente_dto import IngredienteRequestDTO
 #todos los metodos HTTP que vamos a utilizar se define como metodos
 #de la clase
 class IngredientesController(Resource):
@@ -13,15 +15,20 @@ class IngredientesController(Resource):
             'content':{
                 'id': resultado[0].id,
                 'nombre':resultado[0].nombre
-
-            } 
-        }
+                      } 
+                }
     def post(self):
         print(request.get_json())
         #registramos un nuevo ingrediente
+        data = request.get_json()
+        
         try:
+            #validara que la data que el usuario me esta enviando cumpla con todos las
+            #caracteristicas de mi modelo(que sea un string, que no sea muy largp(mas de 45))
+            data_serializada = IngredienteRequestDTO().load(data)
+            print(data_serializada)
             nuevoIngrediente = Ingrediente()
-            nuevoIngrediente.nombre= 'Leche evaporada'
+            nuevoIngrediente.nombre= data_serializada.get('nombre')
             #ahora guardo la informacion en la base de datos
             conexion.session.add(nuevoIngrediente)
             #add> estamos creando una nueva transaccion
@@ -40,3 +47,33 @@ class IngredientesController(Resource):
                 'message': 'Hubo un erro al crear el ingrediente',
                 'content': e.args[0]
             }
+
+class PruebaController(Resource):
+    def post(self):
+        try:
+            data = request.get_json()
+            validacion = ValidadorPrueba().load(data)
+            print(validacion)
+            return{
+                'message':'ok',
+                'data': validacion
+            }
+        except Exception as e:
+            print(e.args)
+            return{
+                'message': 'error al recibir datos',
+                'content': e.args
+            }           
+    def get(self):
+        usuario={
+            'nombre':'Mabel',
+            'apellido':'cisneros',
+            'nacionalidad':'Peru',
+            'password': 'mamma'
+        }
+        resultado = ValidarUsuarioPrueba().dump(usuario)
+        return{
+            'message': 'EL usuario es',
+            'content' : usuario,
+            'resultado':resultado
+        }
