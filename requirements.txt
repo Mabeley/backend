@@ -1,2 +1,2 @@
 -r requirements-dev.txt
-uwsgi
+gunicorn==20.1.0
