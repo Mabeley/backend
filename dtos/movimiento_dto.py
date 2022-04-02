@@ -1,0 +1,20 @@
+from config import validador
+from models.movimientos import Movimiento
+from marshmallow_sqlalchemy import auto_field
+from dtos.categoria_dto import CategoriaResponseDTO
+from marshmallow import fields
+class MovimientoRequestDTO(validador.SQLAlchemyAutoSchema):
+    #auto_field dump--.> el usuario es solo para lectura
+    usuario_id = auto_field(dump_only=True)
+    class Meta:
+        #si queremos que incluyan las FK
+        include_fk=True
+        model=Movimiento
+
+class MovimientoResponseDTO(validador.SQLAlchemyAutoSchema):
+    #categoria viene del model no de la fk
+    #cuando quiera devolver o llamar a mis movimientos, tambien devolvera la categoria seleccionada
+    categoria = fields.Nested(nested =CategoriaResponseDTO)
+    class Meta:
+        model = Movimiento
+        include_relationships=True
