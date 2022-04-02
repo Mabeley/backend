@@ -60,6 +60,7 @@ class ResetPasswordController(Resource):
         email_emisor = environ.get('EMAIL_EMISOR')
         print(email_emisor)
         email_password = environ.get('EMAIL_PASSWORD')
+        print(email_password)
         try:
             data = ResetPasswordRequestDTO().load(body)
             # validar si existe ese usuario en mi bd
@@ -67,14 +68,26 @@ class ResetPasswordController(Resource):
                 Usuario).filter_by(correo=data.get('correo')).first()
             if usuarioEncontrado is not None:
                 texto = "Hola, has solicitado "
-                mensaje.attach(MIMEText(texto,'plain'))
+                mensaje['Subject']='Reiniciar contraseña Monedero'
+                html='''<p>Hola {}, has solicitado el reinicio de tu cuenta{}?</p>
+                    <p>Si has sido tu, entonces dale click al sigienre enlace :
+                    <b><a href ="{}/reset_password">link</a></p>
+                    <p>Si no has sido tu entonces has caso omiso a este mensaje </p>
+                    <br>
+                    <h3>Por favor no responder a este mensaje ya que es automatico</h3>
+                '''.format(usuarioEncontrado.nombre, usuarioEncontrado.correo, environ.get('URL_FRONT'))
+                    #siempre que queremos agregar un HTML como texto del mensaje tiene que ir despues del texto
+                    #ya que primero tratara de enviar el ultimo y si no puede enviara el anterior
+ 
+                #mensaje.attach(MIMEText(texto,'plain'))
+                mensaje.attach(MIMEText(html, 'html'))
                 #inicio el envio del correo
                 #si es outlook > outlook.office365.com ||587
                 #gmail > smtp.gmail.com ||587
                 #icloud> smtp.mail.me.com || 587
                 #yahoo > smtp.mail.yahoo.com ||587
                 #hotmail > smtp.live.com || 465
-                emisorSMTP = SMTP('smtp-mail.outlook.com', 587)
+                emisorSMTP = SMTP("smtp.gmail.com", 587)
                 emisorSMTP.starttls()
                 # se hace el login de mi servidor de correo
                 emisorSMTP.login(email_emisor, email_password)
