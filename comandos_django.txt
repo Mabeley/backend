@@ -1,0 +1,2 @@
+Todos los comando de django se realizan mediante ek comando 'django-admin'
+django-admin startproject NOMBRE_PROYECTO > creara un nuevo proyecto con los archivos nesarios para django
