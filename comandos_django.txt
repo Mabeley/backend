@@ -1,2 +1,26 @@
 Todos los comando de django se realizan mediante ek comando 'django-admin'
 django-admin startproject NOMBRE_PROYECTO > creara un nuevo proyecto con los archivos nesarios para django
+
+para que me muestre todas migraciones>  python manage.py showmigrations
+
+
+
+
+
+
+python manage.py makemigrations NOMBRE_APP --name NOMBRE_MIGRACION > creara
+ una nueva migracion de nuestra aplicacion con todos los cambios que se 
+ habran hecho en el ORM
+
+ python manage.py sqlmigrate NOMBRE_APP NUMERO_MIGRACION > mostrara el SQL
+  de la migracion creada
+
+
+  revertir todas las migraciones de la aplicacion> 
+  python manage.py showmigrations gestion zero
+
+ NOTA:
+python manage.py migrate NOMBRE_APP NUMERO_MIGRACION > efectuar dicha 
+migracion o se puede revertir hasta la migracion seleccionada (todas las
+ migraciones efectuadas queden sin efecto) si queremos revetir absolutamente
+  todas las migraciones podemos colocar en NUMERO_MIGRACION zero  
