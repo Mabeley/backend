@@ -5,5 +5,5 @@ from .views import inicio
 #solamente se puede usar esta variable
 
 urlpatterns = [
-    path('/inicio', inicio)
+    path('inicio', inicio)
 ]
