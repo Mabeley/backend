@@ -24,3 +24,7 @@ python manage.py migrate NOMBRE_APP NUMERO_MIGRACION > efectuar dicha
 migracion o se puede revertir hasta la migracion seleccionada (todas las
  migraciones efectuadas queden sin efecto) si queremos revetir absolutamente
   todas las migraciones podemos colocar en NUMERO_MIGRACION zero  
+
+
+python manage.py shell>>> proporciona una Interfaz de comandos python pero 
+importando todas la liberias de django  

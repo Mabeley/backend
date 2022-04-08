@@ -6,9 +6,14 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
-from rest_framework.generics import ListAPIView, ListCreateAPIView
-from .serializers import PruebaSerializer, TareaSerializer
-from .models import Tareas
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from .serializers import PruebaSerializer, TareasSerializer, EtiquetaSerializer, TareaSerializer
+from .models import Etiqueta, Tareas
+from rest_framework import status
+#son un conjunto de librerias que django nos provee para poder utilizar de una manera
+#mas rapida ciertas configuraciones, timezone sirve para en base a la configuracion que 
+#colocamos en el settins.py TIME_ZONE se basara en esta para darnos la hora y fecha con esa configuracion
+from django.utils import timezone
 
 @api_view(http_method_names=['GET', 'POST'])
 def inicio(request: Request):
@@ -68,4 +73,42 @@ class PruebaApiView(ListAPIView):
             })
 class TareasApiView(ListCreateAPIView):
     queryset =Tareas.objects.all() #> esto es igual a SELECT * FROM tareas;
-    serializer_class= TareaSerializer
+    serializer_class= TareasSerializer
+
+    def post(self, request: Request):
+        #serializo la data para validar sus valores y su configuracion
+        serializador = self.serializer_class(data=request.data)
+        #llamo al metodo validar que retornara True si cumple o False si no
+        if serializador.is_valid():
+            #serializador.initial_data > data inicial sin la validacion
+            #serializador.validated_data> data ya validada(solo se puede llamar
+            #luego de llamar al metodo is_valid())
+            #validare que la fehca_caducidad no sea menor que hoy
+            fechaCaducidad= serializador.validated_data.get('fechaCaducidad')
+            print(type(serializador.validated_data.get('fechaCaducidad')))
+            #validar que la importancia sea entre 0 y 10
+            importancia= serializador.validated_data.get('importancia')
+            if importancia <0 or importancia >10:
+                return Response (data ={
+                    'message':'La importancia puede ser entre 0 y 10'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            if timezone.now()> fechaCaducidad:
+                return Response(data={
+                    'message':'La fecha no puede ser menor que la fecha actual'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            serializador.save()
+                #STATUS> https://www.django-rest-framework.org/api-guide/status-codes/#status-codes
+            return Response(data=serializador.data, status = status.HTTP_201_CREATED) #created
+        else:
+            serializador.errors
+            return Response(data={
+                'message':'La data no es valida',
+                'content': serializador.errors},
+                status = status.HTTP_400_BAD_REQUEST)
+class EtiquetasApiView(ListCreateAPIView):
+    queryset = Etiqueta.objects.all()
+    serializer_class= EtiquetaSerializer
+
+class TareaApiView(RetrieveUpdateDestroyAPIView):
+    serializer_class=TareaSerializer
+    queryset =Tareas.objects.all()
