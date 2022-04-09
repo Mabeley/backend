@@ -6,14 +6,18 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from .serializers import PruebaSerializer, TareasSerializer, EtiquetaSerializer, TareaSerializer
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
+from .serializers import PruebaSerializer, TareasSerializer, EtiquetaSerializer, TareaSerializer, ArchivoSerializer
 from .models import Etiqueta, Tareas
 from rest_framework import status
 #son un conjunto de librerias que django nos provee para poder utilizar de una manera
 #mas rapida ciertas configuraciones, timezone sirve para en base a la configuracion que 
 #colocamos en el settins.py TIME_ZONE se basara en esta para darnos la hora y fecha con esa configuracion
 from django.utils import timezone
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+
 
 @api_view(http_method_names=['GET', 'POST'])
 def inicio(request: Request):
@@ -112,3 +116,27 @@ class EtiquetasApiView(ListCreateAPIView):
 class TareaApiView(RetrieveUpdateDestroyAPIView):
     serializer_class=TareaSerializer
     queryset =Tareas.objects.all()
+
+class ArchivosApiView(CreateAPIView):
+    serializer_class = ArchivoSerializer
+    def post(self, request: Request):
+        print(request.FILES)
+        data= self.serializer_class(data = request.FILES)
+        if data.is_valid():
+            print(type(data.validated_data.get('archivo')))
+            archivo: InMemoryUploadedFile = data.validated_data.get('archivo')
+            print(archivo.name)
+            #default_storage>> https://docs.djangoproject.com/en/4.0/topics/files/#storage-objects
+            resultado =default_storage.save(archivo.name, ContentFile(archivo.read()))
+            #el metodo read() lee archivos, pero la lectura hara que tambien se elimine
+            #de la memoria temporal, asi q por ende no se puede llamar dos o mas veces a este metodo
+            #ya que en la segunda no tendremos archivo que mostrar
+            print(resultado)
+            return Response(data={'message':'archivo guardado exitosamente'},
+            status=status.HTTP_201_CREATED)
+        else:
+            return Response(data={
+                'message':'Error al subir la imagen',
+                'content':data.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+        

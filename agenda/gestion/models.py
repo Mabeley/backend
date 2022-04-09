@@ -1,4 +1,5 @@
 from datetime import datetime
+from distutils.command.upload import upload
 from tkinter.tix import INTEGER
 from django.db import models
 
@@ -59,6 +60,12 @@ class Tareas(models.Model):
     #para crear las relaciones entre las tablas, aca ya no es necesario usar las relashionship
     #porque ya estan integradas dentro de la relacion
     etiquetas =models.ManyToManyField(to=Etiqueta, related_name = 'tareas')
+    foto = models.ImageField(
+    #el ImageField sirve para guardar la ubicacion en donde se almacenara mi imagen en el servidor
+        #https://docs.djangoproject.com/en/4.0/ref/models/fields/#imagefield
+        upload_to='multimedia',
+        null = True
+        )
     class Meta:
         db_table = 'tareas'
 #si la tbala tareas_etiquetas no fuese una tabla pivote, detalle entonces tendria que 
