@@ -11,7 +11,12 @@ class PruebaSerializer(serializers.Serializer):
 
 
 class TareasSerializer(serializers.ModelSerializer):
+    # Modifico la configuracion del modelo y le puedo setear la nueva configuracion 
+    # que respetera el serializador, no se puede hacer cambios de tipos de datos muy 
+    # drasticos (x ejemplo: si en el modelo es un IntegerField en el serializador no
+    #  podre cambiarlo a CharField porque me lanzara un error al momento de guardar la data)
     #https://www.django-rest-framework.org/api-guide/serializers/#modelserializer
+    foto = serializers.CharField(max_length=100)
     class Meta:
         model =Tareas
         fields ='__all__' #estare indicando que voy a utilizar todas las columnas de mi tabla
@@ -72,3 +77,6 @@ class ArchivoSerializer(serializers.Serializer):
     #USE_URL > si es verdadero retornara el link completo de la ubicacion del archivo
     #caso contrario retornara solamente la ubicacion dentro del proyecto del archivo
     archivo = serializers.ImageField(max_length=100, use_url =True)
+
+class EliminarArchivoSerializer(serializers.Serializer):
+    archivo = serializers.CharField(max_length=100)

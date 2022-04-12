@@ -6,8 +6,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
-from .serializers import PruebaSerializer, TareasSerializer, EtiquetaSerializer, TareaSerializer, ArchivoSerializer
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView, DestroyAPIView
+from .serializers import PruebaSerializer, TareasSerializer, EtiquetaSerializer, TareaSerializer, ArchivoSerializer, EliminarArchivoSerializer
 from .models import Etiqueta, Tareas
 from rest_framework import status
 #son un conjunto de librerias que django nos provee para poder utilizar de una manera
@@ -17,7 +17,8 @@ from django.utils import timezone
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-
+from os import remove
+from django.conf import settings
 
 @api_view(http_method_names=['GET', 'POST'])
 def inicio(request: Request):
@@ -121,22 +122,61 @@ class ArchivosApiView(CreateAPIView):
     serializer_class = ArchivoSerializer
     def post(self, request: Request):
         print(request.FILES)
+        queryParams = request.query_params
+        carpetaDestino = queryParams.get('carpeta')
         data= self.serializer_class(data = request.FILES)
         if data.is_valid():
             print(type(data.validated_data.get('archivo')))
             archivo: InMemoryUploadedFile = data.validated_data.get('archivo')
-            print(archivo.name)
+            print(archivo.size)
+            #solamente subir imagenes de hasta 5MB
+            #5(bytes) * 1024 > (kb) * 1024 > Mb
+            #5*1024*1024 >
+            if archivo.size>(5*1024*1024):
+                return Response(data={
+                    'message':'Archivo muy grande, no puede ser mas de 5Mb'
+                }, status=status.HTTP_400_BAD_REQUEST)
             #default_storage>> https://docs.djangoproject.com/en/4.0/topics/files/#storage-objects
-            resultado =default_storage.save(archivo.name, ContentFile(archivo.read()))
+            resultado =default_storage.save(
+                (carpetaDestino+'/' if carpetaDestino is not None else '')+archivo.name, ContentFile(archivo.read()))
             #el metodo read() lee archivos, pero la lectura hara que tambien se elimine
             #de la memoria temporal, asi q por ende no se puede llamar dos o mas veces a este metodo
             #ya que en la segunda no tendremos archivo que mostrar
             print(resultado)
-            return Response(data={'message':'archivo guardado exitosamente'},
-            status=status.HTTP_201_CREATED)
+            return Response(data={
+                'message': 'archivo guardado exitosamente',
+                'content': {
+                    'ubicacion': resultado
+                }
+            }, status=status.HTTP_201_CREATED)
         else:
             return Response(data={
                 'message':'Error al subir la imagen',
                 'content':data.errors
                 }, status=status.HTTP_400_BAD_REQUEST)
         
+#        
+class EliminarArchivoApiView(DestroyAPIView):
+    #el generico DestroyAPIView solicita una pk como parametro de la url 
+    #para eliminar un determinado registro de un modelo personalizara 
+    #para no recibir ello
+    serializer_class = EliminarArchivoSerializer
+    def delete(self, request: Request):
+        data= self.serializer_class(data = request.data)
+        try:
+            data.is_valid(raise_exception=True)
+            ubicacion =data.validated_data.get('archivo')
+            remove(settings.MEDIA_ROOT/ ubicacion)
+            return Response(data={
+                'message':'Archivo eliminado exitosamente'
+            })
+            # else:
+            #     return Response(data={
+            #         'message': 'Error al eliminar el archivo',
+            #         'content':data.errors
+            #     })
+        except Exception as e:
+            return Response(data={
+                'message':'Error al eliminar el archivo',
+                'content':e.args
+            },status = status.HTTP_400_BAD_REQUEST)

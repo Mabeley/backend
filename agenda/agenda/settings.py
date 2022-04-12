@@ -129,3 +129,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#sera la ruta por la cual se podra devolver todos los archivos multimedias
+#de el proyecto
+MEDIA_URL ='/archivos/'
+
+#MEDIA> multimedia
+#sirve para ubicar de donde se extraeran los archivos solicitados por la url
+MEDIA_ROOT = BASE_DIR / 'imagenes'
