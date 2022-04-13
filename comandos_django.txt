@@ -5,7 +5,7 @@ para que me muestre todas migraciones>  python manage.py showmigrations
 
 
 
-
+python manage.py startapp "nombre de app" > para crear una aplicacion
 
 
 python manage.py makemigrations NOMBRE_APP --name NOMBRE_MIGRACION > creara
@@ -39,3 +39,15 @@ python manage.py test > corre todos los test definidos en los archivos tests.py 
  definicion de la ejecucion de los tests siendo 0 el mas corto y 3 el mas explicito, ademas se puede agregar el nombre 
  de la aplicacion para que solo se corra esos tests y mas a detalle poner el nombre del archivo ademas se puede poner 
  la clase hasta colocar el nombre de que unico test se desea correr dentro de la clase
+
+
+django-admin startproject restaurante .  >para crear la carpeta pero q esta no cree dentro una carpeta con el mismo nombre
+
+
+
+No se puede crear aplicaciones con los nombres de las aplicaciones de Django: auth, contenttypes, message, users, admin,
+ sessions, staticfiles
+
+
+
+ python manage.py createsuperuser > crea un superusuario para que pueda utilizado en el panel administrativo

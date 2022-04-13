@@ -1,0 +1,13 @@
+from django.db import models
+
+# Create your models here.
+class Plato(models.Model):
+    #foto > ImageField()
+    id= models.AutoField(primary_key=True)
+    nombre =models.CharField(max_length=45, null=False)
+    foto = models.ImageField()
+    disponible = models.BooleanField(default=True, null=False)
+    precio = models.FloatField(null=False)
+
+    class Meta:
+        db_table ='platos'
