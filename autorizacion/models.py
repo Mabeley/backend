@@ -2,6 +2,7 @@ from django.db import models
 #AbstractBaseUser > me permite modificar todo el modelo auth:_user desded cero
 #AbstractBaseUser> me permite agregar nuevas columnas de las que ya estaban creadas inicialmente
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from autorizacion.authManager import UserManager
 class Usuario(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     correo =models.EmailField(unique=True, null=False)
@@ -9,8 +10,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     nombre = models.CharField(max_length=45, null=False)
     rol=models.CharField(choices=(
         #con la cual se usara en la bd y se mostrara | la que se usara para los formularios
-        ['ADMINISTRADOR','ADMINISTRADOR']
-        ['MOZO','MOZO']), max_length=40)
+         ['ADMINISTRADOR', 'ADMINISTRADOR'],
+        ['MOZO', 'MOZO']), max_length=40)
     #si queremos seguir utilizando el panel administrativo entonces deberemos declarar las
     #siguientes columnas
 
@@ -23,4 +24,12 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     createdAt = models.DateTimeField(auto_now_add=True, db_column='created_at')
     #comportamiento que tendra el modelo cuando se realixe el comando createsuperuser
-    objects= None
+    objects= UserManager()
+    #sera el campo que pedira aparte de la password en el panel administrativo ´para hacer el login
+    USERNAME_FIELD='correo'
+    # seran los atributos que me solicitara por la consola al crear el superusuario,
+    #no van los campos especificados en el USERNAME_FIELD y el password
+    REQUIRED_FIELDS =['nombre','rol']
+
+    class Meta:
+        db_table='usuarios'
