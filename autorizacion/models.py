@@ -1,6 +1,6 @@
 from django.db import models
 #AbstractBaseUser > me permite modificar todo el modelo auth:_user desded cero
-#AbstractBaseUser> me permite agregar nuevas columnas de las que ya estaban creadas inicialmente
+#AbstractUser> me permite agregar nuevas columnas de las que ya estaban creadas inicialmente
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from autorizacion.authManager import UserManager
 class Usuario(AbstractBaseUser, PermissionsMixin):

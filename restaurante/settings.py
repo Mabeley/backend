@@ -14,6 +14,12 @@ from datetime import timedelta
 from pathlib import Path
 from os import environ
 from dotenv import load_dotenv
+#para crear la configuracion entre mi proyecto y cloudinary
+import cloudinary
+#estare indicando que voy a poder subir imagenes
+import cloudinary.uploader
+#podre usar la API de cloudinary
+import cloudinary.api
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'cloudinary',
     'fact_electr',
     'menu',
     'autorizacion'
@@ -140,13 +147,24 @@ AUTH_USER_MODEL ='autorizacion.Usuario'
 
 #sirve para toda la configuracion de nuestro DjangoRestFramework
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES':{
+    'DEFAULT_AUTHENTICATION_CLASSES':[
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    }
+    ]
 }
 
-from datetime import timedelta
+
 #sirve para modificar las configuraciones iniciales de simplejwt
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME' :timedelta(hours=1)
 }
+
+cloudinary.config(
+    cloud_name = environ.get('CLOUDINARY_NAME'),
+    api_key = environ.get('CLOUDINARY_API_KEY'),
+    api_secret =environ.get('CLOUDINARY_SECRET')
+)
+
+
+# ctrl+ D > seleccionamos las coincidencias 
+# alt> seleccionamos varias partes del texto
+# ctrl+shift+der|izq>seleccionamos toda la palabra
