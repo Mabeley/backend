@@ -2,15 +2,16 @@ from io import open_code
 from django.db import models
 from autorizacion.models import Usuario
 from menu.models import Stock
+from django.utils import timezone
 # Create your models here.
 
 class Pedido(models.Model):
     id= models.AutoField(primary_key=True)
-    fecha= models.DateTimeField()
+    fecha= models.DateTimeField(default=timezone.now)
     total= models.FloatField(null=False)
-    numeroDocumentoCliente = models.CharField(max_length=12)
+    numeroDocumentoCliente = models.CharField(max_length=12, null=True)
     tipoDocumentoCliente = models.CharField(choices=(['RUC','RUC'],
-        ['DNI','DNI']), max_length=5)
+        ['DNI','DNI']), max_length=5,  null=True)
     mesa=models.IntegerField()
     propina=models.FloatField()
     # comprobante=models.OneToOneField(to=Comprobante, related_name='pedido', on_delete=models.CASCADE,
