@@ -125,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Lima'
 
 USE_I18N = True
 
@@ -168,3 +168,7 @@ cloudinary.config(
 # ctrl+ D > seleccionamos las coincidencias 
 # alt> seleccionamos varias partes del texto
 # ctrl+shift+der|izq>seleccionamos toda la palabra
+
+STATICFILES_STORAGE ='whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+STATIC_ROOT = BASE_DIR /'static_files'

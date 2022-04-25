@@ -1,6 +1,7 @@
 entorno_django/
 __pycache__/
 .env
+static_files/
 #Archivos de imagenes
 *.jpg
 *.jpeg
